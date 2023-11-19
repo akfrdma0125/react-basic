@@ -54,14 +54,12 @@ function Create(props){
       <form onSubmit={
         event => {
           event.preventDefault();
-          const title = event.target.titile.value;
+          const title = event.target.title.value;
           const body = event.target.body.value;
           props.onCreate(title, body);
         }
       }>
         <p><input type='text' name='title' placeholder='title'/> </p>
-        {/* placeholder === Android hint 
-            p === \n */}
         <p><textarea name='body' placeholder='body'></textarea></p>
         <p><input type='submit' value="Create"></input></p>
       </form>
@@ -103,7 +101,7 @@ function App() {
     content = <Create onCreate={
       (_title, _body) => {
         const newTopic = {id: nextId, title: _title, body: _body}
-        const newTopics = {...topics} //데이터 복제
+        const newTopics = [...topics] //데이터 복제
         newTopics.push(newTopic);
         setTopics(newTopics);
         setMode('READ');
