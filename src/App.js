@@ -22,7 +22,7 @@ function Nav(props){
     lis.push(<li key={t.id}><a id = {t.id} href={'/read/'+t.id} onClick={
       event => {
         event.preventDefault();
-        props.onChangeMode(event.target.id); //여기서 event.target 은 a 태그, 이벤트를 호출한 태그
+        props.onChangeMode(Number(event.target.id)); //여기서 event.target 은 a 태그, 이벤트를 호출한 태그
       }
     }>{t.title}</a></li>);
     // 반복문 내에서 추적할 수 있게 key 라는 고유한 값을 갖는 props가 필요함
@@ -49,12 +49,13 @@ function Article(props){
 
 /*
 state
-state 값이 변화하고, App() 함수가 재실행될 때, 리턴 값이 변화하게 됨!
+state 값이 변화하고, App() 함수가 재실행될 때, 리턴 값이 변화하게 됨! -> 동적인 값을 리턴하고 싶을 때!
 useState 자료형은 크기가 2인 배열, 0번째 원소: 데이터, 1번째 원소: 함수
 */
 
 function App() {
   const [mode, setMode] = useState('WELCOME');
+  const [id, setId] = useState(null);
   console.log('mode', mode);
   const topics = [
     {id: 1, title: 'html', body: 'html is ...'},
@@ -65,7 +66,14 @@ function App() {
   if (mode === 'WELCOME') {
     content = <Article title="Welcome" body="Hello, Web"></Article>
   } else if (mode === 'READ'){
-    content = <Article title="Welcome" body="Hello, Read"></Article>
+    let title, body = null;
+    for (let idx = 0; idx < topics.length; idx++) {
+      if (topics[idx].id === id) {
+        title = topics[idx].title;
+        body = topics[idx].body;
+      }
+    }
+    content = <Article title={title} body={body}></Article>
   } 
   return (
     <div>
@@ -76,8 +84,9 @@ function App() {
         //onChangeMode라는 props 값으로 함수를 전달
       }></Header>
       <Nav topics={topics} onChangeMode={
-        (id) => {
+        (_id) => {
           setMode('READ');
+          setId(_id);
         }
       }></Nav>
       {content}
