@@ -30,6 +30,7 @@ function Nav(props){
   return(
     // <nav> : 다른 페이지 또는 현재 페이지의 다른 부분과 연결되는 네비게이션 링크(navigation links)들의 집합
     // <ol> : 순서가 있는 html list 표현, 대개 <li> 와 함께 사용됨. 기본값은 1/2/3 ... (지정 가능)
+    // <ul> : 순사가 없는 html list 표현, 마찬가지로 <li> 와 함께 사용됨.
     <nav>
       <ol>
         {lis}
@@ -67,6 +68,38 @@ function Create(props){
   )
 }
 
+//update 하려면 꼭! props가 아니라 state 설정해야 함!!!
+function Update(props){
+  const [title, setTitle] = useState(props.title);
+  const [body, setBody] = useState(props.body);
+  return (
+    <article>
+      <h2>Update</h2>
+      <form onSubmit={
+        event => {
+          event.preventDefault();
+          const title = event.target.title.value;
+          const body = event.target.body.value;
+          props.onUpdate(title, body);
+        }
+      }>
+        <p><input type='text' name='title' placeholder='title' value={title} onChange={
+          event => {
+            setTitle(event.target.value); //이벤트마다 컴포넌트 다시 랜더링
+          }
+        }/> </p>
+        <p><textarea name='body' placeholder='body' value={body} onChange={
+          event => {
+            setBody(event.target.value);
+          }
+        }></textarea></p>
+        <p><input type='submit' value="Update"></input></p>
+      </form>
+    </article>
+  )
+}
+
+
 /*
 state
 state 값이 변화하고, App() 함수가 재실행될 때, 리턴 값이 변화하게 됨! -> 동적인 값을 리턴하고 싶을 때!
@@ -86,6 +119,7 @@ function App() {
     {id: 3, title: 'javascript', body: 'javascript is ...'}
   ]);
   let content = null;
+  let contextControl = null;
   if (mode === 'WELCOME') {
     content = <Article title="Welcome" body="Hello, Web"></Article>
   } else if (mode === 'READ'){
@@ -97,6 +131,12 @@ function App() {
       }
     }
     content = <Article title={title} body={body}></Article>
+    contextControl = <li><a href={'/update/'+id} onClick={
+      event => {
+        event.preventDefault();
+        setMode('UPDATE');
+      }
+    }>Update</a></li>
   } else if (mode === 'CREATE') {
     content = <Create onCreate={
       (_title, _body) => {
@@ -109,6 +149,29 @@ function App() {
         setNextId(nextId+1);
       }
     }/>
+  } else if (mode === 'UPDATE') {
+    let title, body = null;
+    for (let idx = 0; idx < topics.length; idx++) {
+      if (topics[idx].id === id) {
+        title = topics[idx].title;
+        body = topics[idx].body;
+      }
+    }
+    content = <Update title={title} body={body} onUpdate={
+      (title, body) => {
+        console.log(title, body);
+        const newTopics = [...topics];
+        const updatedTopic = {id: id, title: title, body: body} //id는 state
+        for (let i = 0; i < newTopics.length; i++) {
+          if (newTopics[i].id === id) {
+            newTopics[i] = updatedTopic;
+            break;
+          }
+        }
+        setTopics(newTopics);
+        setMode('READ');
+      }
+    } ></Update>
   }
   return (
     <div>
@@ -125,12 +188,16 @@ function App() {
         }
       }></Nav>
       {content}
-      <a href='/create' onClick={
-        event => {
-          event.preventDefault();
-          setMode('CREATE');
-        }
-      }>Create</a>
+      <ul>
+        <li>
+          <a href='/create' onClick={
+          event => {
+            event.preventDefault();
+            setMode('CREATE');
+          }}>Create</a>
+        </li>
+      </ul>
+      {contextControl}
     </div>
   );
 }
