@@ -1,0 +1,13 @@
+#container,
+#container > div div {
+    border: 5px solid red;
+    margin: 10px;
+}
+
+/* #container > div div : div의 직계 자식에게 적용
+   #container div : 본인 포함 직계 자식 적용 */
+
+#grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
